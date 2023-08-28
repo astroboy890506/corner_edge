@@ -69,7 +69,7 @@ def main():
             corner_quality = st.sidebar.slider("Corner Quality", min_value=0.01, max_value=0.5, value=0.04, step=0.01)
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             gray = np.float32(gray)
-            dst = cv2.cornerHarris(gray, 6, 7, corner_quality)
+            dst = cv2.cornerHarris(gray, 4, 5, corner_quality)
             dst = cv2.dilate(dst, None)
             corners_img = img.copy()
             corners_img[dst > 0.01 * dst.max()] = [0, 0, 255]
