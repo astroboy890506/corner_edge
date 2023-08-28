@@ -4,7 +4,7 @@ import numpy as np
 
 def main():
     st.set_page_config(
-        page_title="Image Processing App",
+        page_title="Edges and Corner Detector",
         layout="wide"
     )
 
