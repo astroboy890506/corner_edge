@@ -39,19 +39,18 @@ def main():
                 st.image(edgesCanny, caption="Edges (Canny)", use_column_width=True)
 
         elif process_option == "Detect Edges (Sobel)":
-                edgesSobel = cv2.Sobel(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.CV_64F, 1, 0, ksize=mask_size)
-                edgesSobel = cv2.convertScaleAbs(edgesSobel)  # Convert to absolute values
-                dgesSobel = cv2.normalize(edgesSobel, None, 0, 1, cv2.NORM_MINMAX)  # Normalize to [0.0, 1.0] range
+            edgesSobel = cv2.Sobel(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.CV_64F, 1, 0, ksize=mask_size)
+            edgesSobel = cv2.convertScaleAbs(edgesSobel)  # Convert to absolute values
+            edgesSobel = cv2.normalize(edgesSobel, None, 0, 1, cv2.NORM_MINMAX)  # Normalize to [0.0, 1.0] range
 
-                st.subheader("Image Comparison")
-                col1, col2 = st.columns(2)
+            st.subheader("Image Comparison")
+            col1, col2 = st.columns(2)
 
             with col1:
                 st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), caption="Original Image", use_column_width=True)
 
             with col2:
                 st.image(edgesSobel, caption="Edges (Sobel)", use_column_width=True)
-
 
         elif process_option == "Detect Edges (Prewitt)":
             kernel = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
