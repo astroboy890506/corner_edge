@@ -18,8 +18,11 @@ def main():
         img = cv2.resize(img, None, fx=0.5, fy=0.5)
 
         st.sidebar.subheader("Image Processing Options")
-        process_option = st.sidebar.selectbox("Select an option", ["Detect Edges (Canny)", "Detect Edges (Prewitt)",
-                                                                   "Detect Edges (Sobel)", "Detect Corners"])
+        process_option = st.sidebar.selectbox("Select an option", ["Detect Edges (Canny)", "Detect Edges (Sobel)",
+                                                                   "Detect Edges (Prewitt)", "Detect Corners (Harris)"])
+
+        if process_option.startswith("Detect Edges"):
+            mask_size = st.sidebar.slider("Mask Size", min_value=3, max_value=7, value=3, step=2)
 
         if process_option == "Detect Edges (Canny)":
             mask_min = st.sidebar.slider("Canny Mask Minimum Value", min_value=0, max_value=255, value=100)
@@ -35,20 +38,8 @@ def main():
             with col2:
                 st.image(edgesCanny, caption="Edges (Canny)", use_column_width=True)
 
-        elif process_option == "Detect Edges (Prewitt)":
-            edgesPrewitt = cv2.filter2D(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), -1, np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]]))
-
-            st.subheader("Image Comparison")
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), caption="Original Image", use_column_width=True)
-
-            with col2:
-                st.image(edgesPrewitt, caption="Edges (Prewitt)", use_column_width=True)
-
         elif process_option == "Detect Edges (Sobel)":
-            edgesSobel = cv2.Sobel(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.CV_64F, 1, 0, ksize=3)
+            edgesSobel = cv2.Sobel(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), cv2.CV_64F, 1, 0, ksize=mask_size)
 
             st.subheader("Image Comparison")
             col1, col2 = st.columns(2)
@@ -59,13 +50,9 @@ def main():
             with col2:
                 st.image(edgesSobel, caption="Edges (Sobel)", use_column_width=True)
 
-        elif process_option == "Detect Corners":
-            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-            corners = cv2.goodFeaturesToTrack(gray, maxCorners=100, qualityLevel=0.01, minDistance=10)
-            corners_img = img.copy()
-            for corner in corners:
-                x, y = corner.ravel()
-                cv2.circle(corners_img, (x, y), 3, 255, -1)
+        elif process_option == "Detect Edges (Prewitt)":
+            kernel = np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]])
+            edgesPrewitt = cv2.filter2D(cv2.cvtColor(img, cv2.COLOR_BGR2GRAY), -1, kernel)
 
             st.subheader("Image Comparison")
             col1, col2 = st.columns(2)
@@ -74,7 +61,25 @@ def main():
                 st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), caption="Original Image", use_column_width=True)
 
             with col2:
-                st.image(cv2.cvtColor(corners_img, cv2.COLOR_BGR2RGB), caption="Corners", use_column_width=True)
+                st.image(edgesPrewitt, caption="Edges (Prewitt)", use_column_width=True)
+
+        elif process_option == "Detect Corners (Harris)":
+            corner_quality = st.sidebar.slider("Corner Quality", min_value=0.01, max_value=0.5, value=0.04, step=0.01)
+            gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+            gray = np.float32(gray)
+            dst = cv2.cornerHarris(gray, 2, 3, corner_quality)
+            dst = cv2.dilate(dst, None)
+            corners_img = img.copy()
+            corners_img[dst > 0.01 * dst.max()] = [0, 0, 255]
+
+            st.subheader("Image Comparison")
+            col1, col2 = st.columns(2)
+
+            with col1:
+                st.image(cv2.cvtColor(img, cv2.COLOR_BGR2RGB), caption="Original Image", use_column_width=True)
+
+            with col2:
+                st.image(cv2.cvtColor(corners_img, cv2.COLOR_BGR2RGB), caption="Corners (Harris)", use_column_width=True)
 
 if __name__ == "__main__":
     main()
