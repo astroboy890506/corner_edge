@@ -8,7 +8,7 @@ def main():
         layout="wide"
     )
 
-    st.title("Image Processing")
+    st.title("Edges and Corner Detector")
 
     uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
 
